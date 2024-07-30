@@ -56,7 +56,7 @@ RUN . /opt/ros/humble/setup.sh && cd /ros2_ws && colcon build
 
 #RUN mkdir /app
 
-RUN echo 'hello'
+
 
 
 # RUN mkdir /dev \    
