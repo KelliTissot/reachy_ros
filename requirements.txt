@@ -1,0 +1,7 @@
+numpy 
+scipy 
+pyquaternion 
+#sklearn 
+scikit-learn
+jupyter
+matplotlib

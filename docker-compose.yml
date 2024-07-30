@@ -1,0 +1,7 @@
+
+services:
+  ros:
+    build: .
+    volumes:
+      - /home/ros_data:/root/.ros
+    command: tail -f /dev/null
