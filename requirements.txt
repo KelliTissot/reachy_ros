@@ -5,3 +5,4 @@ pyquaternion
 scikit-learn
 jupyter
 matplotlib
+pypot

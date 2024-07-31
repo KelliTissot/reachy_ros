@@ -3,5 +3,6 @@ services:
   ros:
     build: .
     volumes:
-      - /home/ros_data:/root/.ros
+      - .volumes/ros_data:/root/.ros
+      - ./reachy.yaml:/ros2_ws/reachy.yaml
     command: tail -f /dev/null

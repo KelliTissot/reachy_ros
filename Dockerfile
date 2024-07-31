@@ -17,6 +17,7 @@ FROM ros:humble-ros-base
 #     && apt-get install -y ros-humble-desktop \
 #     && apt-get install -y ros-dev-tools \
 
+# INSTALANDO ROS2 - HUMBLE
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     ros-humble-desktop=0.10.0-1* \
@@ -25,13 +26,15 @@ RUN apt-get update \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
+
+# CRIANDO A WORKSPACE
 RUN mkdir -p /ros2_ws/src \
     && cd /ros2_ws \
     && colcon build --symlink-install
 
 RUN apt-get update  && apt-get install -y git git-lfs && git lfs install
 
-## Install cargo
+## Install cargo - RUST é necessário para permitir a comunicação entre o hardware e os pacotes ROS.
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
@@ -48,28 +51,25 @@ RUN pip3 install setuptools==58.2.0
 COPY requirements.txt /ros2_ws/
 RUN pip3 install -r /ros2_ws/requirements.txt
 
+## CLONANDO PACOTES ROS2 DO REACHY
+
 RUN cd /ros2_ws && bash ./src/reachy_2023/dependencies.sh
 RUN cd /ros2_ws && pip3 install -r ./src/reachy_2023/requirements.txt
-
-#scripts são geralmente escritos para ser executados com bash, mas o shell padrão em muitos contêineres Docker é sh
 RUN . /opt/ros/humble/setup.sh && cd /ros2_ws && colcon build  
 
-#RUN mkdir /app
 
 
+## CLONANDO OS PACOTES PYTHON - pacotes usados ​​com Reachy que não são baseados em ROS.
+
+RUN mkdir -p /root/dev
+
+RUN cd /root/dev \
+  && git clone https://github.com/pollen-robotics/reachy-sdk-api.git \
+  && cd reachy-sdk-api \
+  && pip3 install -e python
 
 
-# RUN mkdir /dev \    
-#     && cd /dev
-
-#RUN cd /dev \
- #   && git clone https://github.com/pollen-robotics/reachy-sdk-api.git \
-  #  && git clone https://github.com/pollen-robotics/reachy-sdk.git
-
-#RUN apt-get update
-
-#RUN cd /dev/reachy-sdk-api \
-  #  && pip3 install -e python
-
-#RUN cd /dev/reachy-sdk \
- #   && pip3 install -e . 
+RUN cd /root/dev \
+  && git clone https://github.com/pollen-robotics/reachy-sdk.git \
+  && cd ~/dev/reachy-sdk \
+  && pip3 install -e .
