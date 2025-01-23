@@ -1,4 +1,4 @@
-# Aplicações de controle do braço direito do robô open source Reachy para o projeto REHABOT-FURG
+# Aplicações de controle para o braço direito do robô REHABOT-FURG
 
 ## Tecnologias
 
