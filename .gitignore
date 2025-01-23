@@ -1,4 +1,4 @@
 .volumes
 venv
 test_urdf
-assets 
+/assets/
