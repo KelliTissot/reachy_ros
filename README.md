@@ -1,4 +1,4 @@
-# Aplicações de controle para o braço direito do robô REHABOT-FURG
+# Aplicações de controle para o braço do robô REHABOT-FURG
 
 ## Tecnologias
 
