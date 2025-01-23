@@ -23,9 +23,15 @@ RUN apt-get update \
     ros-humble-desktop=0.10.0-1* \
     ros-humble-tf-transformations \
     ros-humble-compressed-image-transport \
+    ros-humble-dynamixel-* \
+    ros-humble-gazebo-* \
+    ros-humble-action-msgs \
+    ros-humble-ament-cmake \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y ros-humble-rmw-cyclonedds-cpp \
+    && rm -rf /var/lib/apt/lists/*
 
 # CRIANDO A WORKSPACE
 RUN mkdir -p /ros2_ws/src \
@@ -37,6 +43,25 @@ RUN apt-get update  && apt-get install -y git git-lfs && git lfs install
 ## Install cargo - RUST é necessário para permitir a comunicação entre o hardware e os pacotes ROS.
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Add Docker's official GPG key # as chaves GPG são usadas para assinar pacotes distribuídos em repositórios, garantindo que eles não foram alterados por terceiros.
+RUN apt-get update && apt-get install ca-certificates curl gnupg \
+    install -m 0755 -d /etc/apt/keyrings \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+    chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources #O APT utilizará a chave GPG armazenada em /etc/apt/keyrings/docker.gpg para verificar a autenticidade dos pacotes.
+RUN echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    
+RUN apt-get update
+
+#instala o Docker e seus principais componentes no sistema
+RUN apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin #
+
 
 
 RUN cd /ros2_ws/src && git clone https://github.com/pollen-robotics/reachy_2023.git
@@ -56,8 +81,6 @@ RUN pip3 install -r /ros2_ws/requirements.txt
 RUN cd /ros2_ws && bash ./src/reachy_2023/dependencies.sh
 RUN cd /ros2_ws && pip3 install -r ./src/reachy_2023/requirements.txt
 RUN . /opt/ros/humble/setup.sh && cd /ros2_ws && colcon build  
-
-
 
 ## CLONANDO OS PACOTES PYTHON - pacotes usados ​​com Reachy que não são baseados em ROS.
 

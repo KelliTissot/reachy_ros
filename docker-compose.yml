@@ -1,8 +1,17 @@
-
 services:
-  ros:
-    build: .
+  reachy_2023:
+    image: pollenrobotics/reachy_2023:1.1
+    container_name: reachy_2023
+    privileged: true
+    environment:
+      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      - DISPLAY=$DISPLAY
+      - "RCUTILS_CONSOLE_OUTPUT_FORMAT=[{severity}]: {message}"
+      - $HOME/.ssh:/home/reachy/.ssh
     volumes:
-      - .volumes/ros_data:/root/.ros
-      - ./reachy.yaml:/ros2_ws/reachy.yaml
-    command: tail -f /dev/null
+      - $PWD:/opt/docker_reachy_2023_src:ro
+    network_mode: "host"
+    entrypoint:  /package/start.sh
+
+
+
