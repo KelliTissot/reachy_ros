@@ -1,15 +1,19 @@
 services:
-  reachy_2023:
-    image: pollenrobotics/reachy_2023:1.1
-    container_name: reachy_2023
+  rehabot:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: rehabot_2025
     privileged: true
     environment:
-      - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
+      # - ROS_DOMAIN_ID=$ROS_DOMAIN_ID
       - DISPLAY=$DISPLAY
       - "RCUTILS_CONSOLE_OUTPUT_FORMAT=[{severity}]: {message}"
       - $HOME/.ssh:/home/reachy/.ssh
     volumes:
-      - $PWD:/opt/docker_reachy_2023_src:ro
+      - $PWD:/opt/docker_reachy_2023_src/
+      - ./src:/rehabot
+      # - ./src/square.py:/opt/reachy_ws/src/reachy_2023/reachy_kdl_kinematics/reachy_kdl_kinematics/square.py
     network_mode: "host"
     entrypoint:  /package/start.sh
 

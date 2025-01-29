@@ -2,3 +2,5 @@
 venv
 test_urdf
 assets/
+**/__pycache__
+src/rehabot.egg-info
