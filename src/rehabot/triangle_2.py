@@ -4,31 +4,45 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from scipy.spatial.transform import Rotation
 
-class SquareTrajectory(Node):
+class TriangleTrajectory(Node):
     def __init__(self):
-        super().__init__('square_trajectory')
+        super().__init__('triangle_trajectory')
         
         self.pose_pub = self.create_publisher(PoseStamped, '/r_arm/target_pose', 10)
         
         # Parâmetros otimizados
-        self.interpolation_points = 50  # Pontos interpolados
-        self.gravity_compensation = 0.06  # 3 cm
-        self.trajectory_points = self.create_square_points()
+        self.interpolation_points = 50
+        self.gravity_compensation = 0.06  # 6 cm
+        self.trajectory_points = self.create_triangle_points()
         self.current_point = 0
         
         self.timer = self.create_timer(0.05, self.publish_next_pose)  # 20 Hz
 
-    def create_square_points(self):
+    def create_triangle_points(self):
+        side_length = 0.3  # 30 cm de lado
+        base_z = -0.3      # Altura base inicial
+        
+        # Calcula a altura do triângulo equilátero
+        height = (np.sqrt(3)/2) * side_length  # ~0.2598m
+        
         base_points = [
-            {'position': [0.3, -0.4, -0.3], 'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()},
-            {'position': [0.3, -0.4, 0.0], 'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()},
-            {'position': [0.3, -0.1, 0.0], 'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()},
-            {'position': [0.3, -0.1, -0.3], 'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()}
+            # Vértice inferior esquerdo
+            {'position': [0.3, -0.4, base_z], 
+             'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()},
+            
+            # Vértice inferior direito
+            {'position': [0.3, -0.1, base_z], 
+             'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()},
+            
+            # Vértice superior
+            {'position': [0.3, -0.25, base_z + height],  # Centralizado em Y
+             'orientation': Rotation.from_euler('xyz', [0, -np.pi/2, 0]).as_quat()}
         ]
         
+        # Aplica compensação de gravidade
         for point in base_points:
             point['position'][2] += self.gravity_compensation
-        
+            
         return self.generate_interpolated_trajectory(base_points)
 
     def generate_interpolated_trajectory(self, base_points):
@@ -43,6 +57,7 @@ class SquareTrajectory(Node):
     def generate_interpolated_points(self, start, end, num_points):
         points = []
         for i in range(num_points):
+            # Interpolação sinusoidal para suavização
             alpha = np.sin((i / (num_points - 1)) * np.pi/2)
             interp_pos = [
                 start['position'][0] + alpha*(end['position'][0] - start['position'][0]),
@@ -62,9 +77,10 @@ class SquareTrajectory(Node):
         msg.header.stamp = self.get_clock().now().to_msg()
         msg.header.frame_id = 'torso'
         
+        # Aplica compensações finais
         msg.pose.position.x = point['position'][0]
         msg.pose.position.y = point['position'][1]
-        msg.pose.position.z = point['position'][2] + 0.01  # Compensação adicional
+        msg.pose.position.z = point['position'][2] + 0.01  # +1cm adicional
         
         msg.pose.orientation.x = point['orientation'][0]
         msg.pose.orientation.y = point['orientation'][1]
@@ -76,7 +92,7 @@ class SquareTrajectory(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = SquareTrajectory()
+    node = TriangleTrajectory()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:

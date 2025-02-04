@@ -1,36 +1,63 @@
-# Aplicações de controle para o braço do robô REHABOT-FURG
+# Aplicações de controle para o braço robótico - modelo Reachy 
 
-## Tecnologias
+Este repositório contém aplicações de controle para o braço do robô Reachy, utilizando tecnologias como ROS2, Docker, Gazebo e Python. Abaixo estão as instruções para configurar e executar o ambiente de simulação.
 
-- <img src="assets/ros.svg" alt="ROS2" width="40"/> - **ROS2 Humble**
-- <img src="assets/docker.svg" alt="Docker" width="40"/> - **Docker**
-- <img src="assets/probot.svg" alt="Gazebo" width="40"/> - **Gazebo**
-- <img src="assets/python.svg" alt="Python" width="40"/> - **Python**
+## Tecnologias Utilizadas
+
+**ROS2 Humble**: Framework de software para desenvolvimento de robótica. 
+
+**Docker**: Plataforma para criar, deploy e rodar aplicações em containers.
+
+**Gazebo**: Simulador de robótica para testar algoritmos em ambientes virtuais.
+
+**Python**: Linguagem de programação utilizada para desenvolver os algoritmos de controle.
 
 
+## Instalação e Execução
+Siga os passos abaixo para configurar e executar o ambiente de simulação:
 
-## Instalação
-1. Clonar o repositório:
+1. **Clonar o repositório:**
 ```bash 
     git clone git@github.com:KelliTissot/reachy_ros.git
 ```
 
-2. Ambiente Virtual
+2. **Iniciar os containers Docker:**
+No terminal, execute o seguinte comando para construir e iniciar os containers:
 ```bash
-    python3 -m venv venv #criar ambiente virtual
-    source /venv/bin/activate # ativar ambiente dentro do ubuntu
-
+    docker compose up --build 
 ```
-
-3. Dentro do ambiente virtual
+3. **Acessar o container em execução:**
+Em outro terminal, acesse o container Docker em execução com o seguinte comando:
 ```bash
-    docker compose up -d #iniciar conteiners
+    docker exec -it <nome_do_container> bash #Substitua <nome_do_container> pelo nome do container que está em execução.
 ```
-4. Em outro terminal
-```bash
-    docker exec -it <nome_do_container> bash #abrir um terminal interativo dentro do conteiner em execução
-```
-5. Abrir o ambiente de simulação
+4. **Iniciar o ambiente de simulação:**
+Dentro do container, execute o seguinte comando para iniciar o ambiente de simulação no Gazebo e o RVIZ:
 ```bash
     ros2 launch reachy_bringup reachy.launch.py start_sdk_server:=true gazebo:=true start_rviz:=true
 ```
+5. **Executar o algoritmo de controle:**
+OBS: O robô seguirá a trajetória definida no arquivo __init__.py.
+```bash
+    ros2 run reachy_kdl_kinematics rehabot
+```
+6. **Executar outra trajetória:**
+Para executar uma trajetória diferente, substitua o nome do arquivo Python no trecho abaixo, localizado no arquivo __init__.py:
+
+O robô seguirá a trajetória definida no arquivo __init__.py.
+Para executar outra trajetória, é necessário trocar o nome do código.py desejado em: 
+```bash
+    from rehabot.<nome_do_código_desejado> import main
+```
+## Estrutura do Projeto
+
+- reachy_bringup/: Contém os arquivos de configuração e lançamento do ROS2.
+
+- reachy_kdl_kinematics/: Contém os algoritmos de cinemática e controle do robô.
+
+- rehabot/: Contém os scripts Python que definem as trajetórias do robô.
+
+
+## Atribuições
+
+Este projeto utiliza arquivos e recursos do projeto open source **[Pollen Robotics](https://www.pollen-robotics.com/)**, resposnável por desenvolver o robô **Reachy** que serve como base para o projeto RehaBot desde o início. 
