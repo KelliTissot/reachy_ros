@@ -51,7 +51,7 @@ Para executar outra trajetória, é necessário trocar o nome do código.py dese
 ```
 ## Estrutura do Projeto
 
-- reachy_bringup/: Contém os arquivos de configuração e lançamento do ROS2.
+<!-- - reachy_bringup/: Contém os arquivos de configuração e lançamento do ROS2. -->
 
 - reachy_kdl_kinematics/: Contém os algoritmos de cinemática e controle do robô.
 
